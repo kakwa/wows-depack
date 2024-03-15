@@ -3,8 +3,6 @@
 #include <pcre.h>
 #include "hashmap.h"
 
-#pragma pack(1)
-
 /* Limits */
 
 // Maximum number of directories in a path (protection against infinite loops)
@@ -13,6 +11,7 @@
 // Put some limits on the file name size
 #define WOWS_PATH_MAX 4096
 
+#define WOWS_FILE_DIR_MAX 32 * 1024 * 1024
 /* ---------- */
 
 /* Errors */
@@ -31,7 +30,7 @@
 // INDEX file header
 typedef struct {
     char magic[4];
-    uint32_t unknown_1;
+    uint32_t endianess;
     uint32_t id;
     uint32_t unknown_2;
     uint32_t file_dir_count;
@@ -42,13 +41,18 @@ typedef struct {
     uint64_t offset_idx_footer_section;
 } WOWS_INDEX_HEADER;
 
+#define SIZE_WOWS_INDEX_HEADER 56
+
 // INDEX file metadata entry
 typedef struct {
     uint64_t file_name_size;
     uint64_t offset_idx_file_name;
     uint64_t id;
     uint64_t parent_id;
+    char *_file_name;
 } WOWS_INDEX_METADATA_ENTRY;
+
+#define SIZE_WOWS_INDEX_METADATA_ENTRY 32
 
 // INDEX file pkg data pointer entry
 typedef struct {
@@ -62,12 +66,17 @@ typedef struct {
     uint32_t padding;
 } WOWS_INDEX_DATA_FILE_ENTRY;
 
+#define SIZE_WOWS_INDEX_DATA_FILE_ENTRY 48
+
 // INDEX file footer
 typedef struct {
     uint64_t pkg_file_name_size;
     uint64_t unknown_7;
     uint64_t id;
+    char *_file_name;
 } WOWS_INDEX_FOOTER;
+
+#define SIZE_WOWS_INDEX_FOOTER 24
 
 // PKG file ID + padding
 typedef struct {
@@ -145,11 +154,9 @@ typedef struct {
 /* ---------- */
 
 bool checkOutOfIndex(char *start, char *end, WOWS_INDEX *index);
-int get_metadata_filename(WOWS_INDEX_METADATA_ENTRY *entry, WOWS_INDEX *index, char **out);
-int get_metadata_filename_unsafe(WOWS_INDEX_METADATA_ENTRY *entry, WOWS_INDEX *index, char **out);
-int get_footer_filename(WOWS_INDEX_FOOTER *footer, WOWS_INDEX *index, char **out);
+int wows_free_index(WOWS_INDEX *index, int flag);
 int wows_parse_index(char *index_file_path, WOWS_CONTEXT *context);
-int map_index_file(char *contents, size_t length, WOWS_INDEX **index_in);
+int map_index_file(char *contents, size_t length, WOWS_INDEX **index_in, WOWS_CONTEXT *context);
 char *wows_render_str(char *fmt, ...);
 void wows_set_error_details(WOWS_CONTEXT *context, char *fmt, ...);
 int print_header(WOWS_INDEX_HEADER *header);
@@ -191,16 +198,14 @@ pcre *compile_regex(const char *pattern);
 bool match_regex(pcre *re, const char *subject);
 int free_regex(pcre *re);
 
-int write_file_name(char **input_buffer, size_t *offset, char *name, size_t *current_size);
-
+int write_file_name(wows_writer *writer, char *name);
 int write_file_pkg_entry(WOWS_INDEX_DATA_FILE_ENTRY **file_section, uint64_t *file_section_size, uint64_t metadata_id,
                          uint64_t footer_id, uint64_t offset, uint32_t size, uint64_t pkg_id, uint64_t *file_count);
 
 int write_data_blob(char *file_path, FILE *pkg_fp, uint64_t *offset, uint32_t *size_written, uint64_t pkg_id);
 
-int write_metadata_entry(WOWS_INDEX_METADATA_ENTRY **metadata, uint64_t *metadata_section_size, uint64_t metadata_id,
-                         uint64_t file_name_size, uint64_t offset_idx_file_name, uint64_t parent_id,
-                         uint64_t *file_plus_dir_count);
+int write_metadata_entry(wows_writer *writer, uint64_t metadata_id, uint64_t parent_id, uint64_t offset_idx_file_name,
+                         char *file_name);
 int recursive_writer(wows_writer *writer, char *path, uint64_t parent_id);
 int copy_data(FILE *in, FILE *out, long offset, size_t size);
 int internal_wows_extract_dir(WOWS_CONTEXT *context, char *dir_path, char *out_dir_path, FILE *magic_fp);

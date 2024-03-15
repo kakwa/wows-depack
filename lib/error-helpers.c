@@ -14,31 +14,31 @@ char *wows_error_string(int error_code, WOWS_CONTEXT *context) {
 
     switch (error_code) {
     case WOWS_ERROR_CORRUPTED_FILE:
-        error_string = "The index is corrupted";
+        error_string = "index is corrupted";
         break;
     case WOWS_ERROR_BAD_MAGIC:
-        error_string = "The index has an invalid magic number";
+        error_string = "index has an invalid magic number";
         break;
     case WOWS_ERROR_MISSING_METADATA_ENTRY:
-        error_string = "The file is missing a required metadata entry";
+        error_string = "file is missing a required metadata entry";
         break;
     case WOWS_ERROR_MAX_LEVEL_REACHED:
-        error_string = "The maximum level has been reached";
+        error_string = "maximum depth level has been reached";
         break;
     case WOWS_ERROR_NON_ZERO_TERMINATED_STRING:
-        error_string = "A string in the index is not null-terminated";
+        error_string = "string in index file not null-terminated";
         break;
     case WOWS_ERROR_PATH_TOO_LONG:
-        error_string = "The file path is too long";
+        error_string = "file path too long";
         break;
     case WOWS_ERROR_UNKNOWN:
-        error_string = "An unknown error occurred";
+        error_string = "unknown error occurred";
         break;
     case WOWS_ERROR_ID_COLLISION_FILE_DIR:
-        error_string = "There is an ID collision between a file and a directory";
+        error_string = "ID collision between a file and a directory";
         break;
     case WOWS_ERROR_FILE_OPEN_FAILURE:
-        error_string = "The index could not be opened";
+        error_string = "index file could not be opened";
         break;
     case WOWS_ERROR_DECOMPOSE_PATH:
         error_string = "failed to decompose path into [dir1, dir2, etc] + file";
@@ -57,6 +57,9 @@ char *wows_error_string(int error_code, WOWS_CONTEXT *context) {
         break;
     case WOWS_ERROR_FILE_WRITE:
         error_string = "file write error";
+        break;
+    case WOWS_ERROR_MAX_FILE:
+        error_string = "maximum number of file/dir in index reached";
         break;
     case 0:
         error_string = "no recent error";

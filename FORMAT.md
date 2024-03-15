@@ -94,7 +94,7 @@ The index file is composed of 5 sections:
 +====+====+====+====++====+====+====+====++====+====+====+====++====+====+====+====+
 | MA | MA | MA | MA || 00 | 00 | 00 | 02 || ID | ID | ID | ID || 40 | 00 | 00 | 00 |
 +====+====+====+====++====+====+====+====++====+====+====+====++====+====+====+====+
-|<----- magic ----->||<--- unknown_1 --->||<------- id ------>||<--- unknown_2 --->|
+|<----- magic ----->||<--- endianess --->||<------- id ------>||<--- unknown_2 --->|
 |     32 bits       ||      32 bits      ||     32 bits       ||      32 bits      |
 
 +====+====+====+====++====+====+====+====++====+====+====+====++====+====+====+====+
@@ -121,7 +121,7 @@ The index file is composed of 5 sections:
 | Field                      |  size   | Description                                                                                                                                     |
 |----------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | `magic`                    | 32 bits | Magic bytes, always "ISFP"                                                                                                                      |
-| `unknown_1`                | 32 bits | Unknown, always 0x2000000                                                                                                                       |
+| `endianess`                | 32 bits | Endianess marker, always 0x2000000 if LE                                                                                                        |
 | `id`                       | 32 bits | Unsure, unique per index file, not referenced anywhere else                                                                                     |
 | `unknown_2`                | 32 bits | Unknown, always 0x40, maybe some offset                                                                                                         |
 | `file_dir_count`           | 32 bits | Number of files + directories (Nfd), also number of entries in the metadata section and the file names section                                  |

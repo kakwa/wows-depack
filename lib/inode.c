@@ -33,8 +33,7 @@ int build_inode_tree(WOWS_INDEX *index, int current_index_context, WOWS_CONTEXT 
         // We go in reverse to start from the root to the immediate parent directory of the file
         for (int j = (depth - 1); j > -1; j--) {
             // We try to get the directory from the current dir (parent_inode)
-            char *name;
-            get_metadata_filename(parent_entries[j], index, &name);
+            char *name = parent_entries[j]->_file_name;
             WOWS_DIR_INODE *existing_inode = (WOWS_DIR_INODE *)get_child(parent_inode, name);
 
             // If the directory inode doesn't exist, we need to create it
@@ -100,17 +99,13 @@ WOWS_DIR_INODE *init_root_inode() {
 // create a dir inode
 WOWS_DIR_INODE *init_dir_inode(uint64_t metadata_id, uint32_t current_index_context, WOWS_DIR_INODE *parent_inode,
                                WOWS_CONTEXT *context) {
-    char *name;
     WOWS_INDEX_METADATA_ENTRY *mentry_search = &(WOWS_INDEX_METADATA_ENTRY){.id = metadata_id};
     void *res = hashmap_get(context->metadata_map, &mentry_search);
     if (res == NULL) {
         return NULL;
     }
     WOWS_INDEX_METADATA_ENTRY *entry = *(WOWS_INDEX_METADATA_ENTRY **)res;
-    int ret = get_metadata_filename(entry, context->indexes[current_index_context], &name);
-    if (ret != 0) {
-        return NULL;
-    }
+    char *name = entry->_file_name;
 
     WOWS_DIR_INODE *dir_inode = calloc(sizeof(WOWS_DIR_INODE), 1);
     dir_inode->type = WOWS_INODE_TYPE_DIR;
@@ -139,12 +134,7 @@ WOWS_FILE_INODE *init_file_inode(uint64_t metadata_id, uint32_t current_index_co
         return NULL;
     }
     WOWS_INDEX_METADATA_ENTRY *entry = *(WOWS_INDEX_METADATA_ENTRY **)res;
-    char *name;
-    int ret = get_metadata_filename(entry, context->indexes[current_index_context], &name);
-    if (ret != 0) {
-        return NULL;
-    }
-
+    char *name = entry->_file_name;
     WOWS_FILE_INODE *file_inode = calloc(sizeof(WOWS_FILE_INODE), 1);
     file_inode->type = WOWS_INODE_TYPE_FILE;
     file_inode->id = metadata_id;

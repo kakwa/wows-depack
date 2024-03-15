@@ -9,6 +9,15 @@ set(wows-depack_VERSION_PATCH 0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+if(STATIC)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+  set(ZLIB_USE_STATIC_LIBS ON)
+  set(BUILD_SHARED_LIBRARIES OFF)
+  set(CMAKE_EXE_LINKER_FLAGS "-static")
+else(STATIC)
+  set(SHARED "SHARED")
+endif(STATIC)
+
 find_package(ZLIB REQUIRED)
 find_package(PCRE REQUIRED)
 find_library(CUNIT_LIBRARY cunit)
@@ -32,40 +41,14 @@ set(CMAKE_CXX_FLAGS
 # Options
 option(DEBUG "compile with debug symbol" OFF)
 option(STATIC "compile statically" OFF)
-option(USE_CLANG "build application with clang" OFF)
-option(USE_GCC "build application with gcc" OFF)
-option(FORCELE "force little endian architecture" OFF)
 option(COVERAGE "Enable code coverage" OFF)
 option(BUILD_DOC "Build documentation" OFF)
 option(BUILD_TESTS "Build tests" OFF)
-
-if(USE_CLANG)
-  set(CMAKE_CXX_COMPILER "clang++")
-  set(CMAKE_CC_COMPILER "clang")
-endif(USE_CLANG)
-
-if(USE_GCC)
-  set(CMAKE_CXX_COMPILER "g++")
-  set(CMAKE_CC_COMPILER "gcc")
-endif(USE_GCC)
 
 if(DEBUG)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g")
   set(CMAKE_BUILD_TYPE Debug)
 endif(DEBUG)
-
-if(STATIC)
-  set(SHARED "")
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  set(BUILD_SHARED_LIBRARIES OFF)
-  set(CMAKE_EXE_LINKER_FLAGS "-static")
-else(STATIC)
-  set(SHARED "SHARED")
-endif(STATIC)
-
-if(UNIX)
-  link_libraries(m)
-endif(UNIX)
 
 # Build external dependancies if we are on OSX
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -74,6 +57,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(EXTERNAL_ARGP "argp")
   add_definitions(-DDARWIN)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+if(UNIX)
+  link_libraries(m)
+endif(UNIX)
 
 # linking directories
 link_directories(${CMAKE_BINARY_DIR}/ /usr/local/lib /usr/lib/)

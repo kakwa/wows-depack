@@ -27,12 +27,7 @@ bool checkOutOfIndex(char *start, char *end, WOWS_INDEX *index) {
 int wows_free_context_internal(WOWS_CONTEXT *context, int flag) {
     for (int i = 0; i < context->index_count; i++) {
         WOWS_INDEX *index = context->indexes[i];
-        if (flag == FREE_WITH_CLOSE) {
-            munmap(index->start_address, index->length);
-            close(index->fd);
-        }
-        free(index->index_file_path);
-        free(index);
+        wows_free_index(index, flag);
     }
 
     free_inode_tree(context->root);
@@ -43,6 +38,24 @@ int wows_free_context_internal(WOWS_CONTEXT *context, int flag) {
         free(context->err_msg);
     }
     free(context);
+    return 0;
+}
+
+int wows_free_index(WOWS_INDEX *index, int flag) {
+    if (flag == FREE_WITH_CLOSE) {
+        munmap(index->start_address, index->length);
+        close(index->fd);
+    }
+    free(index->index_file_path);
+    for (int j = 0; j < index->header->file_dir_count; j++) {
+        free(index->metadata[j]._file_name);
+    }
+    free(index->metadata);
+    free(index->data_file_entry);
+    free(index->footer->_file_name);
+    free(index->footer);
+    free(index->header);
+    free(index);
     return 0;
 }
 
@@ -64,6 +77,9 @@ bool iter_inode_free(const void *item, void *udata) {
 }
 
 int free_inode_tree(WOWS_BASE_INODE *inode) {
+    if (inode == NULL) {
+        return 0;
+    }
     switch (inode->type) {
     case WOWS_INODE_TYPE_FILE:
         free(inode);
