@@ -4,7 +4,7 @@ project(wows-depack)
 
 # Project version (sematic versionning)
 set(wows-depack_VERSION_MAJOR 0)
-set(wows-depack_VERSION_MINOR 1)
+set(wows-depack_VERSION_MINOR 2)
 set(wows-depack_VERSION_PATCH 0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
