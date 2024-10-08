@@ -34,60 +34,15 @@ make
 ## CLI tool
 
 ### Help
+
 ```shell
 ./wows-depack-cli --help
 
-Usage: wows-depack-cli [OPTION...]
-            <-i INPUT_FILE | -I INPUT_DIR | -W WOWS_BASE_DIR>
+Usage: wows-depack-cli [OPTION...] -W WOWS_BASE_DIR
 
-World of Warships resource extractor tool
-
-  -e, --extract=FILE_DIR_TO_EXTRACT
-                             File or directory to extract
-  -i, --input=INPUT_INDEX    Input index file
-  -I, --input-dir=INPUT_INDEX_DIR
-                             Input index directory
-  -o, --output=OUTPUT_FILE   Output file when extracting one file
-  -O, --output-dir=OUTPUT_DIR   Output dir for recursive extract
-  -p, --print                Print All files
-  -s, --search=SEARCH_PATTERN   Search Regex
-  -W, --wows-dir=WOWS_BASE_DIR   Input World of Warships base directory
-  -?, --help                 Give this help list
-      --usage                Give a short usage message
-  -V, --version              Print program version
-
-Mandatory or optional arguments to long options are also mandatory or optional
-for any corresponding short options.
-
-Report bugs to https://github.com/kakwa/wows-depack/issues.
+World of Warships resource extractor tool.
+[...]
 ```
-
-### Parse the index(es)
-
-Parse a single Index file:
-
-```shell
-./wows-depack-cli -i ~/Games/World\ of\ Warships/bin/6831266/idx/system_data.idx
-```
-
-Parse all the indexes in the index directory:
-
-```shell
-./wows-depack-cli -I ~/Games/World\ of\ Warships/bin/6831266/idx/
-```
-
-Auto-discovery of the latest `idx/` directory (from WoWs install directory) and parse all index files:
-
-```shell
-./wows-depack-cli -W ~/Games/World\ of\ Warships/
-```
-
-
-
-Note, the other examples are using `-W <WOWS DIR>` , but it could be faster to specify one index file directly through `-i <FILE>`.
-Specifically, `GameParams,data` is referenced in the `system_data.idx` index.
-
-Also, please note that you will need to adapt the path to your WoWs install and the parent of `idx/` (the `6831266` part changes with every update).
 
 ### Print all files
 
@@ -104,10 +59,10 @@ To print all the files present:
 ```
 ### Search
 
-To search a given file (regular expression):
+Search files by name pattern (perl compatible regular expression):
 
 ```shell
-./wows-depack-cli -W ~/Games/World\ of\ Warships/ -s '.*Params.*'
+./wows-depack-cli -W ~/Games/World\ of\ Warships/ -s '.*[Pp]arams.*'
 
 Found 3 matching files:
 shipyardParams.xml
@@ -133,12 +88,35 @@ To extract a whole sub directory, do:
 	-e 'content/' -O out/
 ```
 
-To extract everything (rip your free disk space), do:
+### Extract every World of Warships resource files
+
+To extract everything (rip your free disk space), run:
 
 ```shell
 ./wows-depack-cli -W ~/Games/World\ of\ Warships/ \
 	-e '/' -O out/
 ```
+
+### Parse Specific index file(s)
+
+Instead of `-W/--wows-dir`, a specific index file or directory can be specified through the `-i` or `-I` options.
+
+Parse a single index file:
+
+```shell
+./wows-depack-cli -i ~/Games/World\ of\ Warships/bin/6831266/idx/system_data.idx -p
+```
+
+Parse all the indexes in an index directory:
+
+```shell
+./wows-depack-cli -I ~/Games/World\ of\ Warships/bin/6831266/idx/ -p
+```
+
+Note, the other examples are using `-W <WOWS DIR>` , but it could be faster to specify one index file directly through `-i <FILE>`.
+Specifically, `GameParams,data` is referenced in the `system_data.idx` index.
+
+Also, please note that you will need to adapt the path to your WoWs install and the parent of `idx/` (the `6831266` part changes with every update).
 
 ## Library
 

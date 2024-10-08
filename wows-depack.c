@@ -30,9 +30,9 @@ const char *argp_program_version = BFD_VERSION;
 
 const char *argp_program_bug_address = "https://github.com/wows-tools/wows-depack/issues";
 
-static char doc[] = "\nWorld of Warships resource extractor tool";
+static char doc[] = "\nWorld of Warships resource extractor tool.";
 
-static struct argp_option options[] = {{"input", 'i', "INPUT_INDEX", 0, "Input index file"},
+static struct argp_option options[] = {{"input", 'i', "INPUT_INDEX_FILE", 0, "Input index file"},
                                        {"input-dir", 'I', "INPUT_INDEX_DIR", 0, "Input index directory"},
                                        {"wows-dir", 'W', "WOWS_BASE_DIR", 0, "Input World of Warships base directory"},
                                        {"output-dir", 'O', "OUTPUT_DIR", 0, "Output dir for recursive extract"},
@@ -44,7 +44,7 @@ static struct argp_option options[] = {{"input", 'i', "INPUT_INDEX", 0, "Input i
                                        {0}};
 
 /* A description of the arguments we accept. */
-static char args_doc[] = "<-i INPUT_FILE | -I INPUT_DIR | -W WOWS_BASE_DIR>";
+static char args_doc[] = "-W WOWS_BASE_DIR";
 
 struct arguments {
     char *args[2]; /* arg1 & arg2 */
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
     }
 
     if (args->input == NULL && args->input_dir == NULL) {
-        fprintf(stderr, "error: no -i <input file> or -I <input dir> arg or -W <wows dir> specified\n");
+        fprintf(stderr, "error: no -i <index file>, -I <index dir> or -W <base wows dir> specified\n");
         return EXIT_FAILURE;
     }
 
