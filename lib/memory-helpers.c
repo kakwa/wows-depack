@@ -47,12 +47,12 @@ int wows_free_index(WOWS_INDEX *index, int flag) {
         close(index->fd);
     }
     free(index->index_file_path);
-    for (int j = 0; j < index->header->file_dir_count; j++) {
+    for (int j = 0; j < (index->header ? index->header->file_dir_count : 0); j++) {
         free(index->metadata[j]._file_name);
     }
     free(index->metadata);
     free(index->data_file_entry);
-    free(index->footer->_file_name);
+    index->footer ? free(index->footer->_file_name) : 0;
     free(index->footer);
     free(index->header);
     free(index);
